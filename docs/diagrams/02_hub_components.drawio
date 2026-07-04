@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-14" version="21.0.0">
+  <diagram name="02 - Hub Components Detail" id="hub-components-v1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="9" value="&lt;b&gt;Aura Promptly — Hub Components Detail (v1.1)&lt;/b&gt;&lt;br&gt;AWS Account · us-east-1 · All components with specs, connections and costs"
+          style="text;html=1;fontSize=15;fontStyle=1;align=center;fillColor=#24292E;fontColor=#FFFFFF;strokeColor=none;rounded=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1820" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- ENTRY LAYER                                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="100" value="&lt;b&gt;PUBLIC ENTRY LAYER&lt;/b&gt;  ·  Internet-facing"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="1820" height="175" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="101" value="&lt;b&gt;Route 53&lt;/b&gt;&lt;br&gt;Hosted Zone&lt;br&gt;CNAME → API GW&lt;br&gt;Optional custom domain&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Cost: ~$0.50/zone/mo&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="110" width="160" height="108" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="102" value="&lt;b&gt;AWS WAF&lt;/b&gt;&lt;br&gt;WebACL attached to API GW&lt;br&gt;Rules:&lt;br&gt;· AWS-AWSManagedRulesCommonRuleSet (OWASP)&lt;br&gt;· Rate-based: 100 req/5min per IP&lt;br&gt;· Geo-block (disabled by default)&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Cost: $5/WebACL + $1/M req  |  Toggle: enable_waf&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="250" y="100" width="370" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="103" value="&lt;b&gt;API Gateway (REST) — Regional Endpoint&lt;/b&gt;&lt;br&gt;Routes: /v1/*  →  LiteLLM (OpenAI-compatible)&lt;br&gt;Authorisers:&lt;br&gt;  · API Key + Usage Plans  (Azure spoke)&lt;br&gt;  · IAM Signature V4  (AWS + GCP spokes)&lt;br&gt;  · Cognito JWT  (future OIDC apps — not used by any current spoke)&lt;br&gt;TLS 1.2 minimum enforced&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Cost: ~$3.50/M API calls (~$0 at PoC volume)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="650" y="100" width="400" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="104" value="&lt;b&gt;Cognito User Pool&lt;/b&gt;&lt;br&gt;M2M client credentials&lt;br&gt;Scopes: litellm.invoke&lt;br&gt;API key issuance (Azure spoke)&lt;br&gt;Note: NOT used for GCP auth (v1.1)&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Cost: Free tier (&lt;50k MAU)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1080" y="100" width="290" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e101" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="101" target="102" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e102" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="102" target="103" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e103" value="JWT authoriser" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;dashed=1;fontSize=8;" edge="1" source="104" target="103" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- GATEWAY LAYER                                       -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="200" value="&lt;b&gt;GATEWAY / ROUTING LAYER&lt;/b&gt;  ·  Private VPC Subnets"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="265" width="1820" height="230" as="geometry"/>
+        </mxCell>
+
+        <!-- LiteLLM detailed box -->
+        <mxCell id="201" value="&lt;b&gt;LiteLLM Proxy  (ECS Fargate)&lt;/b&gt;&lt;br&gt;Image: ghcr.io/berriai/litellm:v1.83.0-stable  (pinned, cosign-verified — ADR-11)&lt;br&gt;Compute: 0.25 vCPU · 512 MB RAM · 1 task&lt;br&gt;Blue/green deploy via ECS rolling update&lt;br&gt;Config hot-reload from S3 (YAML)  ·  No literal secrets in config — all os.environ/SECRET_NAME&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Cost: ~$0.01/hr when running&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;strokeWidth=2;fontSize=9;align=left;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="300" width="860" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="202" value="&lt;b&gt;Routing Rules&lt;/b&gt;&lt;br&gt;YAML config from S3&lt;br&gt;Hot-reload enabled&lt;br&gt;Model aliases mapped&lt;br&gt;to provider endpoints"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="415" width="175" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="203" value="&lt;b&gt;Spend Tracker&lt;/b&gt;&lt;br&gt;per-team · per-model&lt;br&gt;Budget enforcement&lt;br&gt;Stored in Aurora DB&lt;br&gt;litellm schema"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="265" y="415" width="175" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="204" value="&lt;b&gt;Content Filter&lt;/b&gt;&lt;br&gt;Pre-call callback&lt;br&gt;Keyword deny list&lt;br&gt;Prompt injection detect&lt;br&gt;HTTP 400 if blocked"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="460" y="415" width="175" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="205" value="&lt;b&gt;Model Routes&lt;/b&gt;&lt;br&gt;bedrock-haiku → Claude Haiku 3&lt;br&gt;bedrock-kb → Bedrock KB RAG&lt;br&gt;bedrock-agent → Bedrock Agent&lt;br&gt;openai-mini → GPT-4o-mini&lt;br&gt;vertex-flash → Gemini 1.5 Flash"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="655" y="415" width="250" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="206" value="&lt;b&gt;Admin UI&lt;/b&gt;&lt;br&gt;port 4000/ui&lt;br&gt;Internal ALB&lt;br&gt;(not public)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="300" width="110" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="210" value="&lt;b&gt;ElastiCache Redis&lt;/b&gt;&lt;br&gt;cache.t4g.micro&lt;br&gt;Rate limit counters (sliding window)&lt;br&gt;Model response cache (TTL-based)&lt;br&gt;LiteLLM session state&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Cost: ~$12–15/mo  |  Toggle: enable_redis_cache&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="970" y="300" width="330" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="211" value="&lt;b&gt;Application Load Balancer (Internal)&lt;/b&gt;&lt;br&gt;Listener: 80 → LiteLLM:4000&lt;br&gt;Listener: 4001 → Admin UI:4000/ui&lt;br&gt;Not internet-facing"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="970" y="435" width="330" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e201" value="HTTPS proxy" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="103" target="201" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e202" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="201" target="210" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- AI SERVICES LAYER                                   -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="300" value="&lt;b&gt;AI SERVICES LAYER&lt;/b&gt;  ·  Bedrock (VPC endpoint) + External Providers (internet)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="515" width="1820" height="230" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="301" value="&lt;b&gt;Claude Haiku 3&lt;/b&gt;&lt;br&gt;anthropic.claude-3-haiku-20240307-v1:0&lt;br&gt;Region: us-east-1 (lowest price)&lt;br&gt;In: $0.00025 / 1K tokens&lt;br&gt;Out: $0.00125 / 1K tokens&lt;br&gt;Must enable in Bedrock Console"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="552" width="230" height="112" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="302" value="&lt;b&gt;Titan Embeddings v2&lt;/b&gt;&lt;br&gt;amazon.titan-embed-text-v2:0&lt;br&gt;Output: 1024 dimensions&lt;br&gt;Used for KB document indexing&lt;br&gt;$0.00002 / 1K tokens&lt;br&gt;Triggered on KB sync"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="310" y="552" width="230" height="112" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="303" value="&lt;b&gt;Bedrock Knowledge Base&lt;/b&gt;&lt;br&gt;Source: S3 (HTML/PDF/TXT)&lt;br&gt;Vector store: Aurora pgvector (HNSW)&lt;br&gt;Chunking: 512 tokens · 15% overlap&lt;br&gt;Sync: manual (workflow_dispatch / CLI)&lt;br&gt;Recreate: poll for COMPLETE before deploy&lt;br&gt;Future: Confluence · SharePoint connectors"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="560" y="552" width="280" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="304" value="&lt;b&gt;Bedrock Agent&lt;/b&gt;&lt;br&gt;Model: Claude Haiku 3&lt;br&gt;Demo: Research Assistant&lt;br&gt;Action Group: search_knowledge_base (Lambda)&lt;br&gt;Session timeout: 30 min&lt;br&gt;Access via LiteLLM native route:&lt;br&gt;bedrock/agent/{AGENT_ID}/{ALIAS_ID}"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="860" y="552" width="280" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="305" value="&lt;b&gt;Bedrock Guardrails&lt;/b&gt;&lt;br&gt;Applied at model invocation&lt;br&gt;Hate speech: BLOCK&lt;br&gt;Sexual: BLOCK · Violence: BLOCK&lt;br&gt;Misconduct: BLOCK · Insults: BLOCK&lt;br&gt;Denied topics: financial/medical advice&lt;br&gt;$0.75 / 1K text units"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1160" y="552" width="260" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="311" value="&lt;b&gt;OpenAI (GPT-4o-mini)&lt;/b&gt;&lt;br&gt;Route alias: openai-mini&lt;br&gt;API key from Secrets Manager&lt;br&gt;Via internet (no VPC endpoint)&lt;br&gt;Fallback if Bedrock unavailable"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00A67E;strokeColor=#007A5E;fontColor=#FFFFFF;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1450" y="552" width="200" height="112" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="312" value="&lt;b&gt;Vertex AI (Gemini 1.5 Flash)&lt;/b&gt;&lt;br&gt;Route alias: vertex-flash&lt;br&gt;API key from Secrets Manager&lt;br&gt;Via internet (no VPC endpoint)&lt;br&gt;Available to all spokes"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1660" y="552" width="200" height="112" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e301" value="VPC endpoint (no NAT cost)" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;fontStyle=1;fontSize=8;" edge="1" source="201" target="301" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e302" value="HTTPS (internet)" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;dashed=1;fontStyle=1;fontSize=8;" edge="1" source="201" target="311" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e303" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;dashed=1;" edge="1" source="201" target="312" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- DATA LAYER                                          -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="400" value="&lt;b&gt;DATA LAYER&lt;/b&gt;  ·  All destroy-safe (data is ephemeral for PoC)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="765" width="1820" height="175" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="401" value="&lt;b&gt;S3 — KB Bucket&lt;/b&gt;&lt;br&gt;Source docs: HTML · PDF · TXT&lt;br&gt;Re-uploaded via runbook&lt;br&gt;Versioning enabled&lt;br&gt;Destroy-safe: docs in git/runbook"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="805" width="230" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="402" value="&lt;b&gt;S3 — Config Bucket&lt;/b&gt;&lt;br&gt;LiteLLM config.yaml&lt;br&gt;Hot-reload by LiteLLM&lt;br&gt;Source-of-truth: git&lt;br&gt;Destroy-safe: in git"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="310" y="805" width="215" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="403" value="&lt;b&gt;Aurora Serverless (PostgreSQL)&lt;/b&gt;&lt;br&gt;Shared cluster · 2 schemas:&lt;br&gt;  litellm: spend · users · virtual keys · teams&lt;br&gt;  bedrock_kb: pgvector · HNSW index&lt;br&gt;Auto-pause when idle → ~$0/idle&lt;br&gt;Toggle: aurora_auto_pause&lt;br&gt;Destroy-safe: data ephemeral for PoC"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="545" y="805" width="360" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="404" value="&lt;b&gt;Secrets Manager&lt;/b&gt;&lt;br&gt;LiteLLM master key&lt;br&gt;OpenAI API key&lt;br&gt;Vertex AI API key&lt;br&gt;Grafana API token&lt;br&gt;Aurora password&lt;br&gt;Recreated by Terraform"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="925" y="805" width="220" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="405" value="&lt;b&gt;ElastiCache Redis&lt;/b&gt;&lt;br&gt;cache.t4g.micro · in-memory&lt;br&gt;Rate limit state (sliding window)&lt;br&gt;Response cache (TTL per model)&lt;br&gt;Ephemeral · Destroy-safe"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1165" y="805" width="250" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- OBSERVABILITY LAYER                                 -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="500" value="&lt;b&gt;OBSERVABILITY LAYER&lt;/b&gt;  ·  Two-layer architecture (see diagram 06 for detail)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="960" width="1820" height="175" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="501" value="&lt;b&gt;CloudWatch Logs&lt;/b&gt;&lt;br&gt;Log group: /aura-promptly/litellm&lt;br&gt;LiteLLM stdout JSON logs&lt;br&gt;ECS container logs&lt;br&gt;Retention: 30 days (PoC)&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Layer 1 — Always-on (no egress)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="1000" width="250" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="502" value="&lt;b&gt;CloudWatch Metrics + Alarms&lt;/b&gt;&lt;br&gt;EMF embedded metric format&lt;br&gt;Alarms: error rate spike&lt;br&gt;Alarms: P95 latency breach&lt;br&gt;Alarms: spend threshold&lt;br&gt;Email SNS notification"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="330" y="1000" width="260" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="503" value="&lt;b&gt;OTel Collector (ECS sidecar)&lt;/b&gt;&lt;br&gt;Receives logs · metrics · traces&lt;br&gt;from LiteLLM + CloudWatch&lt;br&gt;Vendor-neutral pipeline&lt;br&gt;&lt;font color=&apos;#0000AA&apos;&gt;Layer 2 — Optional (toggle)&lt;/font&gt;&lt;br&gt;enable_grafana_export=true"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCCCFF;strokeColor=#6666CC;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="610" y="1000" width="280" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="504" value="&lt;b&gt;Grafana Cloud (Free Tier)&lt;/b&gt;&lt;br&gt;Loki: 50 GB logs/mo · 14-day retention&lt;br&gt;Tempo: distributed traces&lt;br&gt;Prometheus: 10k active metric series&lt;br&gt;Dashboards: same 4 views as CloudWatch&lt;br&gt;Token in Secrets Manager (never in git)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0820F;strokeColor=#B85A00;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="910" y="1000" width="320" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="505" value="&lt;b&gt;LiteLLM Spend Dashboard&lt;/b&gt;&lt;br&gt;Built-in UI at port 4000/ui&lt;br&gt;Internal ALB only (not public)&lt;br&gt;Shows: spend per team · per model&lt;br&gt;Virtual key management&lt;br&gt;Always available regardless of Layer 2"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1250" y="1000" width="310" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e501" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="501" target="502" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e502" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="502" target="503" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e503" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="503" target="504" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Cost summary box -->
+        <mxCell id="600" value="&lt;b&gt;Cost Summary (v1.1)&lt;/b&gt;&lt;br&gt;&lt;br&gt;Full PoC peak: ~$90–110/mo&lt;br&gt;Hub idle (KB schema dropped): ~$25–30/mo&lt;br&gt;Fully destroyed: $0&lt;br&gt;&lt;br&gt;Top costs:&lt;br&gt;· ElastiCache Redis: ~$12/mo&lt;br&gt;· Aurora Serverless: ~$10/mo active&lt;br&gt;· NAT Gateway: ~$5–10/mo&lt;br&gt;· WAF: ~$5/mo (toggleable)&lt;br&gt;· ECS Fargate: ~$7/mo running&lt;br&gt;&lt;br&gt;Aurora pgvector replaced OpenSearch (~$172/mo)&lt;br&gt;→ ~90% vector store cost saving"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#82B366;strokeWidth=2;fontSize=9;align=left;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="1580" y="765" width="280" height="370" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

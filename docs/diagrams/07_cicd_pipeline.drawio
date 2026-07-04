@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-14" version="21.0.0">
+  <diagram name="07 - CI/CD Pipeline" id="cicd-pipeline-v1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="9" value="&lt;b&gt;Aura Promptly — CI/CD Pipeline Design (v1.1)&lt;/b&gt;&lt;br&gt;Phase 1b: Basic pipeline  ·  Phase 11: Full pipeline  ·  GitHub Actions OIDC (no long-lived credentials)"
+          style="text;html=1;fontSize=15;fontStyle=1;align=center;fillColor=#24292E;fontColor=#FFFFFF;strokeColor=none;rounded=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1820" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- OIDC TRUST SETUP                                    -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="50" value="&lt;b&gt;GitHub Actions OIDC Trust  (one-time Terraform setup — no long-lived credentials stored anywhere)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#24292E;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="1820" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="51" value="&lt;b&gt;AWS OIDC&lt;/b&gt;&lt;br&gt;IAM Identity Provider:&lt;br&gt;token.actions.githubusercontent.com&lt;br&gt;Role: aura-promptly-github-deploy&lt;br&gt;Trust condition: repo + branch + env"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="110" width="280" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="52" value="&lt;b&gt;Azure OIDC&lt;/b&gt;&lt;br&gt;Service Principal with federated creds&lt;br&gt;azure/login action&lt;br&gt;No client secret stored in GitHub&lt;br&gt;Scoped to subscription + RG"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="370" y="110" width="270" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="53" value="&lt;b&gt;GCP OIDC&lt;/b&gt;&lt;br&gt;Workload Identity Federation&lt;br&gt;google-github-actions/auth action&lt;br&gt;Service account impersonation&lt;br&gt;No JSON key file stored"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="670" y="110" width="270" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="54" value="&lt;b&gt;Terraform Cloud&lt;/b&gt;&lt;br&gt;4 workspaces: hub · aws-spoke&lt;br&gt;azure-spoke · gcp-spoke&lt;br&gt;Free tier · remote state locking&lt;br&gt;Variable sets for env-level secrets"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5C4EE5;strokeColor=#4338CA;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="970" y="110" width="270" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="55" value="&lt;b&gt;GitHub Secrets (non-credential)&lt;/b&gt;&lt;br&gt;TF_CLOUD_TOKEN · INFRACOST_API_KEY&lt;br&gt;AWS_ROLE_ARN · AZURE_CLIENT_ID&lt;br&gt;GCP_WORKLOAD_IDENTITY_PROVIDER&lt;br&gt;COSIGN_PUBLIC_KEY"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#24292E;strokeColor=#586069;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1270" y="110" width="300" height="72" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- PHASE 1b: BASIC PIPELINE                           -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="100" value="&lt;b&gt;Phase 1b: Basic CI/CD Pipeline  (available from Phase 1 onwards)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#82B366;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="225" width="1820" height="450" as="geometry"/>
+        </mxCell>
+
+        <!-- PR Pipeline -->
+        <mxCell id="110" value="&lt;b&gt;PR Pipeline  (trigger: pull_request → main)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="265" width="860" height="380" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="111" value="&lt;b&gt;PR opened / updated&lt;/b&gt;&lt;br&gt;Target: main branch"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#24292E;strokeColor=#586069;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="340" y="308" width="190" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="112" value="&lt;b&gt;Job 1: Secret Scan&lt;/b&gt;&lt;br&gt;Tool: gitleaks&lt;br&gt;Scans all changed files&lt;br&gt;Blocks PR if any secrets found&lt;br&gt;Covers: API keys · tokens · passwords&lt;br&gt;Public repo protection (ADR-12)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="388" width="225" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="113" value="&lt;b&gt;Job 2: Terraform Validate&lt;/b&gt;&lt;br&gt;terraform fmt -check (fail if unformatted)&lt;br&gt;terraform init -backend=false&lt;br&gt;terraform validate (syntax + schema)&lt;br&gt;Scope: hub workspace only"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="325" y="388" width="250" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="114" value="&lt;b&gt;Job 3: Terraform Plan&lt;/b&gt;&lt;br&gt;Authenticates via AWS OIDC&lt;br&gt;terraform plan (hub workspace)&lt;br&gt;Posts plan summary to PR comment&lt;br&gt;Fails if plan has errors"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="595" y="388" width="250" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="115" value="&lt;b&gt;All 3 jobs must pass  ·  1 reviewer approval required  ·  Branch protection rule enforced&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="820" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="116" value="&lt;b&gt;PR merged to main&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#24292E;strokeColor=#586069;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="582" width="190" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="117" value="&lt;b&gt;Deploy: terraform apply (hub only)&lt;/b&gt;&lt;br&gt;AWS OIDC auth&lt;br&gt;terraform apply -auto-approve (hub)&lt;br&gt;Posts apply output to run summary&lt;br&gt;SNS notification: success / failure"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="310" y="575" width="290" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e111" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="111" target="112" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e112" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="111" target="113" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e113" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="111" target="114" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e114" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="112" target="115" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e115" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="113" target="115" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e116" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="114" target="115" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e117" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="116" target="117" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Destroy Pipeline (Phase 1b) -->
+        <mxCell id="120" value="&lt;b&gt;Destroy Pipeline  (trigger: workflow_dispatch — manual only, requires confirm=yes input)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="960" y="265" width="880" height="380" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="121" value="&lt;b&gt;Manual trigger&lt;/b&gt;&lt;br&gt;workflow_dispatch&lt;br&gt;Input: confirm = &apos;yes&apos;&lt;br&gt;Prevents accidental destroy"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B85450;strokeColor=#8B0000;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="980" y="310" width="230" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="122" value="&lt;b&gt;Destroy Hub Only&lt;/b&gt;&lt;br&gt;terraform destroy -auto-approve (hub)&lt;br&gt;S3 emptied first (lifecycle rule)&lt;br&gt;(No spoke workspaces in Phase 1b)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="980" y="408" width="360" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="123" value="&lt;b&gt;Step 2: Destroy Hub (Phase 11 — after all spokes destroyed)&lt;/b&gt;&lt;br&gt;terraform destroy -auto-approve (hub)&lt;br&gt;S3 buckets emptied first (lifecycle rule)&lt;br&gt;Aurora cluster deleted&lt;br&gt;VPC + endpoints cleaned up&lt;br&gt;&lt;i&gt;Phase 1b: hub-only destroy (cell above)&lt;/i&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="980" y="530" width="360" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e121" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="121" target="122" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e122" value="after spokes done" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;fontStyle=1;fontSize=8;" edge="1" source="122" target="123" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- PHASE 11: FULL PIPELINE                            -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="200" value="&lt;b&gt;Phase 11: Full CI/CD Pipeline  (extends Phase 1b with security scanning, cost estimates, multi-spoke deploy, smoke tests)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="700" width="1820" height="570" as="geometry"/>
+        </mxCell>
+
+        <!-- Full PR additions -->
+        <mxCell id="210" value="&lt;b&gt;Additional PR Jobs (Phase 11 — run alongside Phase 1b jobs)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#0050C8;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="745" width="1790" height="185" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="211" value="&lt;b&gt;Job 4: tfsec&lt;/b&gt;&lt;br&gt;CIS AWS Terraform benchmark&lt;br&gt;Block on HIGH severity&lt;br&gt;WARN on MEDIUM / LOW&lt;br&gt;Results posted to PR as comment"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="785" width="215" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="212" value="&lt;b&gt;Job 5: checkov&lt;/b&gt;&lt;br&gt;checkov -d terraform/&lt;br&gt;Checks: encryption · IAM · logging&lt;br&gt;S3 public access block&lt;br&gt;Results in SARIF (GitHub Security tab)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="315" y="785" width="215" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="213" value="&lt;b&gt;Job 6: infracost&lt;/b&gt;&lt;br&gt;infracost diff --path=.&lt;br&gt;Computes $ delta vs main branch&lt;br&gt;Posts cost table to PR comment&lt;br&gt;Block if delta &gt; $50/month threshold"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="550" y="785" width="250" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="214" value="&lt;b&gt;Job 7: Multi-Workspace Plan&lt;/b&gt;&lt;br&gt;terraform plan: hub (AWS OIDC)&lt;br&gt;terraform plan: aws-spoke (AWS OIDC)&lt;br&gt;terraform plan: azure-spoke (Azure OIDC)&lt;br&gt;terraform plan: gcp-spoke (GCP WIF)&lt;br&gt;All 4 run in parallel"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0050C8;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="820" y="785" width="280" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="215" value="&lt;b&gt;Job 8: Image Verify (cosign)&lt;/b&gt;&lt;br&gt;cosign verify image signature&lt;br&gt;ghcr.io/berriai/litellm:v1.83.0-stable&lt;br&gt;Public key in GitHub Secrets&lt;br&gt;Block deploy if signature invalid&lt;br&gt;Prevents supply chain attack (ADR-11)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1120" y="785" width="265" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- Full Deploy Pipeline -->
+        <mxCell id="220" value="&lt;b&gt;Full Deploy Pipeline  (trigger: merge to main — hub first, then all spokes in parallel, then smoke tests)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#0050C8;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="950" width="1790" height="300" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="221" value="&lt;b&gt;1. Deploy Hub&lt;/b&gt;&lt;br&gt;terraform apply (hub)&lt;br&gt;AWS OIDC auth&lt;br&gt;Wait: ECS task healthy&lt;br&gt;Wait: Aurora available&lt;br&gt;Output: API GW URL · ALB DNS"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="995" width="215" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="222" value="&lt;b&gt;2a. Deploy AWS Spoke&lt;/b&gt;&lt;br&gt;terraform apply (aws-spoke)&lt;br&gt;AWS OIDC auth&lt;br&gt;Wait: ECS task healthy"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="340" y="980" width="215" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="223" value="&lt;b&gt;2b. Deploy Azure Spoke&lt;/b&gt;&lt;br&gt;terraform apply (azure-spoke)&lt;br&gt;Azure OIDC auth&lt;br&gt;Wait: ACA revision healthy"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="340" y="1080" width="215" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="224" value="&lt;b&gt;2c. Deploy GCP Spoke&lt;/b&gt;&lt;br&gt;terraform apply (gcp-spoke)&lt;br&gt;GCP WIF auth&lt;br&gt;Wait: Cloud Run revision ready"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="340" y="1180" width="215" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="225" value="&lt;b&gt;3. Smoke Tests&lt;/b&gt;&lt;br&gt;POST /v1/chat/completions (each spoke)&lt;br&gt;Verify HTTP 200 + valid JSON body&lt;br&gt;Check model field = expected model&lt;br&gt;Verify spend record written to Aurora&lt;br&gt;Fail fast + alert on any failure"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="600" y="1010" width="290" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="226" value="&lt;b&gt;4. Post-Deploy&lt;/b&gt;&lt;br&gt;GitHub run summary: all workspaces&lt;br&gt;SNS email: deploy success + cost delta&lt;br&gt;Grafana annotation (if Layer 2 enabled)&lt;br&gt;CloudWatch alarm baseline reset"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0050C8;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="920" y="1010" width="280" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e221" value="after hub healthy" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;fontStyle=1;fontSize=8;" edge="1" source="221" target="222" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e222" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="221" target="223" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e223" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="221" target="224" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e224" value="after spokes" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="222" target="225" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e225" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="223" target="225" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e226" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="224" target="225" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e227" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="225" target="226" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Phase comparison table -->
+        <mxCell id="900" value="&lt;b&gt;Phase Comparison&lt;/b&gt;&lt;br&gt;&lt;br&gt;Capability                               Phase 1b    Phase 11&lt;br&gt;─────────────────────────────────────────────────────────&lt;br&gt;Secret scan (gitleaks)                   ✅            ✅&lt;br&gt;terraform fmt + validate                 ✅            ✅&lt;br&gt;terraform plan (hub only)                ✅            ✅&lt;br&gt;terraform apply (hub only)               ✅            ✅&lt;br&gt;Manual destroy pipeline                  ✅            ✅&lt;br&gt;Security scan (tfsec + checkov)          ❌            ✅&lt;br&gt;Cost estimate (infracost)                ❌            ✅&lt;br&gt;Multi-workspace plan (all 4)             ❌            ✅&lt;br&gt;Image signature verify (cosign)          ❌            ✅&lt;br&gt;Multi-spoke deploy (parallel)            ❌            ✅&lt;br&gt;Post-deploy smoke tests                  ❌            ✅"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;fontSize=8;align=left;verticalAlign=top;fontFamily=Courier New;"
+          vertex="1" parent="1">
+          <mxGeometry x="1250" y="980" width="570" height="240" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

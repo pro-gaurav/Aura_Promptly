@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-14" version="21.0.0">
+  <diagram name="01 - Overall Architecture" id="overall-arch-v1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- TITLE BANNER                                        -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="9" value="&lt;b&gt;Aura Promptly — Complete PoC Architecture (v1.1)&lt;/b&gt;&lt;br&gt;Centralised GenAI Hub (AWS) with Multi-Cloud Spokes (Azure · AWS · GCP)"
+          style="text;html=1;fontSize=16;fontStyle=1;align=center;verticalAlign=middle;fillColor=#24292E;fontColor=#FFFFFF;strokeColor=none;rounded=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="50" y="10" width="2300" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- HUB OUTER CONTAINER                                 -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1000" value="&lt;b&gt;CENTRAL GENAI HUB — AWS Account (us-east-1)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8F0;strokeColor=#FF9900;strokeWidth=3;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=8;arcSize=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="50" y="70" width="2300" height="920" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LAYER 1: PUBLIC ENTRY LAYER                        -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1010" value="&lt;b&gt;① PUBLIC ENTRY LAYER&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="110" width="2260" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1101" value="&lt;b&gt;Route 53&lt;/b&gt;&lt;br&gt;Custom domain&lt;br&gt;(optional)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="148" width="140" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1102" value="&lt;b&gt;AWS WAF&lt;/b&gt;&lt;br&gt;OWASP rules&lt;br&gt;100 req / 5 min / IP&lt;br&gt;~$5/mo toggle"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="270" y="138" width="155" height="86" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1103" value="&lt;b&gt;API Gateway (REST)&lt;/b&gt;&lt;br&gt;Regional endpoint&lt;br&gt;/v1/*  OpenAI-compatible&lt;br&gt;Auth: API Key | IAM Sig V4 (AWS+GCP) | Cognito JWT (future)&lt;br&gt;TLS 1.2+ enforced"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="455" y="128" width="215" height="102" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1104" value="&lt;b&gt;Cognito User Pool&lt;/b&gt;&lt;br&gt;M2M client credentials&lt;br&gt;API key issuance (Azure)&lt;br&gt;Free tier (&lt;50k MAU)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="710" y="138" width="185" height="86" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e101" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="1101" target="1102" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e102" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="1102" target="1103" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e103" value="API key issuance" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;dashed=1;fontSize=8;" edge="1" source="1104" target="1103" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LAYER 2: GATEWAY / ROUTING LAYER                   -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1020" value="&lt;b&gt;② GATEWAY / ROUTING LAYER  (Private VPC)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="278" width="2260" height="175" as="geometry"/>
+        </mxCell>
+
+        <!-- LiteLLM container box -->
+        <mxCell id="1200" value="&lt;b&gt;LiteLLM Proxy (ECS Fargate)&lt;/b&gt;&lt;br&gt;&lt;font color=&apos;#555555&apos;&gt;ghcr.io/berriai/litellm:v1.83.0-stable  ·  0.25 vCPU / 512 MB  ·  ~$0.01/hr&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;strokeWidth=2;fontSize=9;fontStyle=0;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="90" y="312" width="760" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1201" value="&lt;b&gt;Routing Rules&lt;/b&gt;&lt;br&gt;YAML config (S3)&lt;br&gt;hot-reload enabled"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="110" y="352" width="155" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1202" value="&lt;b&gt;Spend Tracker&lt;/b&gt;&lt;br&gt;per-team / per-model&lt;br&gt;budget enforcement"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="285" y="352" width="155" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1203" value="&lt;b&gt;Content Filter&lt;/b&gt;&lt;br&gt;pre-call callback&lt;br&gt;keyword deny list"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="460" y="352" width="155" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1204" value="&lt;b&gt;Model Routes&lt;/b&gt;&lt;br&gt;bedrock-haiku  ·  bedrock-kb&lt;br&gt;bedrock-agent  ·  openai-mini&lt;br&gt;vertex-flash"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="635" y="352" width="195" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1210" value="&lt;b&gt;ElastiCache Redis&lt;/b&gt;&lt;br&gt;cache.t4g.micro&lt;br&gt;Rate limit state&lt;br&gt;Response cache"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="880" y="318" width="165" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e201" value="HTTPS" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;fontStyle=1;fontSize=8;" edge="1" source="1103" target="1200" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e202" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="1200" target="1210" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LAYER 3: AI SERVICES LAYER                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1030" value="&lt;b&gt;③ AI SERVICES LAYER&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="472" width="2260" height="195" as="geometry"/>
+        </mxCell>
+
+        <!-- Amazon Bedrock sub-container -->
+        <mxCell id="1300" value="&lt;b&gt;Amazon Bedrock&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF5EA;strokeColor=#82B366;strokeWidth=2;fontSize=10;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="90" y="506" width="1050" height="145" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1301" value="&lt;b&gt;Claude Haiku 3&lt;/b&gt;&lt;br&gt;Primary inference&lt;br&gt;$0.00025 / 1K in&lt;br&gt;$0.00125 / 1K out"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="105" y="540" width="170" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1302" value="&lt;b&gt;Titan Embeddings v2&lt;/b&gt;&lt;br&gt;RAG embedding&lt;br&gt;1024 dims&lt;br&gt;$0.00002 / 1K tokens"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="295" y="540" width="170" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1303" value="&lt;b&gt;Knowledge Base&lt;/b&gt;&lt;br&gt;Aurora pgvector&lt;br&gt;HNSW · 512-token chunks&lt;br&gt;15% overlap"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="485" y="540" width="170" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1304" value="&lt;b&gt;Bedrock Agent&lt;/b&gt;&lt;br&gt;Research Assistant&lt;br&gt;+ Lambda action group&lt;br&gt;30-min session TTL"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="675" y="540" width="170" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1305" value="&lt;b&gt;Bedrock Guardrails&lt;/b&gt;&lt;br&gt;Hate / Violence / Sexual&lt;br&gt;PII / Denied topics&lt;br&gt;$0.75 / 1K text units"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="865" y="540" width="170" height="85" as="geometry"/>
+        </mxCell>
+
+        <!-- External Providers sub-container -->
+        <mxCell id="1310" value="&lt;b&gt;External Providers (internet)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;strokeWidth=2;fontSize=10;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="1175" y="506" width="420" height="145" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1311" value="&lt;b&gt;OpenAI&lt;/b&gt;&lt;br&gt;GPT-4o-mini&lt;br&gt;API key in&lt;br&gt;Secrets Manager"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00A67E;strokeColor=#007A5E;fontColor=#FFFFFF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="1195" y="540" width="165" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1312" value="&lt;b&gt;Vertex AI&lt;/b&gt;&lt;br&gt;Gemini 1.5 Flash&lt;br&gt;API key in&lt;br&gt;Secrets Manager"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="1380" y="540" width="165" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e301" value="VPC endpoint" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;fontStyle=1;fontSize=8;" edge="1" source="1200" target="1300" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e302" value="HTTPS (internet)" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;dashed=1;fontStyle=1;fontSize=8;" edge="1" source="1200" target="1310" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LAYER 4: DATA LAYER                                -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1040" value="&lt;b&gt;④ DATA LAYER&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="686" width="2260" height="135" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1401" value="&lt;b&gt;S3 Buckets&lt;/b&gt;&lt;br&gt;KB source docs (HTML/PDF/TXT)&lt;br&gt;LiteLLM config YAML&lt;br&gt;Terraform state"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="90" y="720" width="200" height="86" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1402" value="&lt;b&gt;Aurora Serverless v2&lt;/b&gt;&lt;br&gt;(PostgreSQL + pgvector)&lt;br&gt;schema: litellm  — spend / users / keys&lt;br&gt;schema: bedrock_kb  — vector store&lt;br&gt;~$0 idle (scale to 0 ACUs)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="315" y="720" width="295" height="86" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1403" value="&lt;b&gt;Secrets Manager&lt;/b&gt;&lt;br&gt;API keys (OpenAI, Vertex)&lt;br&gt;OTel / Grafana tokens&lt;br&gt;Provider credentials"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="635" y="720" width="210" height="86" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1404" value="&lt;b&gt;ElastiCache Redis&lt;/b&gt;&lt;br&gt;cache.t4g.micro&lt;br&gt;Rate limit counters&lt;br&gt;Model response cache"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="870" y="720" width="200" height="86" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LAYER 5: OBSERVABILITY LAYER                       -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1050" value="&lt;b&gt;⑤ OBSERVABILITY LAYER (Two-Layer Architecture)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="70" y="840" width="2260" height="138" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1501" value="&lt;b&gt;CloudWatch&lt;/b&gt;&lt;br&gt;Logs + Metrics + Alarms&lt;br&gt;&lt;font color=&apos;#006600&apos;&gt;Layer 1 — Always on&lt;/font&gt;&lt;br&gt;Zero data egress"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="90" y="875" width="200" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1502" value="&lt;b&gt;OTel Collector&lt;/b&gt;&lt;br&gt;ECS sidecar&lt;br&gt;&lt;font color=&apos;#0000AA&apos;&gt;Layer 2 — Optional&lt;/font&gt;&lt;br&gt;enable_grafana_export=true"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCCCFF;strokeColor=#6666CC;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="320" y="875" width="200" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1503" value="&lt;b&gt;Grafana Cloud&lt;/b&gt;&lt;br&gt;Loki (logs) · Tempo (traces)&lt;br&gt;Prometheus (metrics)&lt;br&gt;Free tier · 14-day retention"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0820F;strokeColor=#B85A00;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="550" y="875" width="210" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1504" value="&lt;b&gt;LiteLLM Dashboard&lt;/b&gt;&lt;br&gt;Built-in spend / token UI&lt;br&gt;port 4000/ui (internal ALB)&lt;br&gt;Always available"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="790" y="875" width="210" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1505" value="&lt;b&gt;4 Dashboards (both layers):&lt;/b&gt;&lt;br&gt;① Platform Overview (req / error / P95)&lt;br&gt;② Spend per Team (bar chart)&lt;br&gt;③ Model Usage (pie chart)&lt;br&gt;④ Guardrail Events (table)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1030" y="875" width="270" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e501" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="1501" target="1502" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e502" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" edge="1" source="1502" target="1503" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- AZURE SPOKE                                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1600" value="&lt;b&gt;AZURE SPOKE&lt;/b&gt;&lt;br&gt;Use Case: RAG Chatbot (Financial Services FAQ)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E5F0FF;strokeColor=#0078D4;strokeWidth=3;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;"
+          vertex="1" parent="1">
+          <mxGeometry x="50" y="1020" width="700" height="250" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1601" value="&lt;b&gt;Azure Container Apps&lt;/b&gt;&lt;br&gt;Serverless · no VNet required"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="1065" width="210" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1602" value="&lt;b&gt;Python FastAPI + Streamlit&lt;/b&gt;&lt;br&gt;RAG chat interface"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#50E6FF;strokeColor=#0078D4;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="1155" width="210" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1603" value="&lt;b&gt;Azure Key Vault&lt;/b&gt;&lt;br&gt;Stores LiteLLM API key"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="320" y="1065" width="190" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1604" value="&lt;b&gt;Auth:&lt;/b&gt;  x-api-key header&lt;br&gt;Key stored in Azure Key Vault&lt;br&gt;Outbound HTTPS only → AWS API GW&lt;br&gt;No inbound rules required"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="320" y="1155" width="390" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- AWS SPOKE                                           -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1610" value="&lt;b&gt;AWS SPOKE&lt;/b&gt;&lt;br&gt;Use Case: Research Assistant (Bedrock Agent)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#FF9900;strokeWidth=3;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;"
+          vertex="1" parent="1">
+          <mxGeometry x="800" y="1020" width="700" height="250" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1611" value="&lt;b&gt;ECS Fargate&lt;/b&gt;&lt;br&gt;Spoke VPC · or Lambda"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="830" y="1065" width="200" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1612" value="&lt;b&gt;Python FastAPI + Streamlit&lt;/b&gt;&lt;br&gt;Research assistant interface"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFD9B3;strokeColor=#FF9900;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="830" y="1155" width="210" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1613" value="&lt;b&gt;IAM Role (cross-account)&lt;/b&gt;&lt;br&gt;STS AssumeRole&lt;br&gt;execute-api:Invoke only"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1065" y="1065" width="200" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1614" value="&lt;b&gt;Auth:&lt;/b&gt;  IAM Signature V4&lt;br&gt;Cross-account STS role · no long-lived keys&lt;br&gt;API GW IAM authoriser validates role ARN"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1065" y="1155" width="400" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- GCP SPOKE                                           -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1620" value="&lt;b&gt;GCP SPOKE&lt;/b&gt;&lt;br&gt;Use Case: Summarisation (Compliance Reports)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#4285F4;strokeWidth=3;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;"
+          vertex="1" parent="1">
+          <mxGeometry x="1560" y="1020" width="740" height="250" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1621" value="&lt;b&gt;Cloud Run&lt;/b&gt;&lt;br&gt;Serverless · no VPC required"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1590" y="1065" width="200" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1622" value="&lt;b&gt;Python FastAPI + Streamlit&lt;/b&gt;&lt;br&gt;Document summarisation UI"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AECBFA;strokeColor=#4285F4;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1590" y="1155" width="210" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1623" value="&lt;b&gt;GCP Workload Identity&lt;/b&gt;&lt;br&gt;Service account OIDC token&lt;br&gt;→ AWS STS AssumeRoleWithWebIdentity&lt;br&gt;15-min TTL · auto-refreshed"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1820" y="1065" width="235" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1624" value="&lt;b&gt;Auth:&lt;/b&gt;  GCP OIDC → STS → IAM Sig V4&lt;br&gt;Direct federation (no Cognito)&lt;br&gt;AWS-documented pattern (Dec 2023)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1820" y="1175" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SPOKE → HUB ARROWS                                 -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="e601" value="HTTPS + API Key"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0078D4;fontColor=#0078D4;fontSize=9;fontStyle=1;"
+          edge="1" source="1601" target="1103" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="185" y="990"/>
+              <mxPoint x="562" y="990"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e602" value="HTTPS + IAM Sig V4"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#CC7A00;fontColor=#CC7A00;fontSize=9;fontStyle=1;"
+          edge="1" source="1611" target="1103" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="930" y="990"/>
+              <mxPoint x="562" y="990"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e603" value="HTTPS + OIDC→STS→IAM Sig V4"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#4285F4;fontColor=#4285F4;fontSize=9;fontStyle=1;"
+          edge="1" source="1621" target="1103" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1690" y="990"/>
+              <mxPoint x="562" y="990"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- DEVOPS TOOLING                                      -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="1700" value="&lt;b&gt;GitHub Actions CI/CD&lt;/b&gt;&lt;br&gt;OIDC (no long-lived creds)&lt;br&gt;Phase 1b (basic) + Phase 11 (full)&lt;br&gt;gitleaks · tfsec · infracost"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#24292E;strokeColor=#586069;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="2120" y="1030" width="210" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="1701" value="&lt;b&gt;Terraform Cloud&lt;/b&gt;&lt;br&gt;Free tier · state mgmt&lt;br&gt;4 workspaces: hub, aws-spoke&lt;br&gt;azure-spoke, gcp-spoke"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5C4EE5;strokeColor=#4338CA;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="2120" y="1160" width="210" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e701" value="terraform apply" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;strokeColor=#24292E;dashed=1;fontSize=8;" edge="1" source="1700" target="1000" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LEGEND                                              -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="9000" value="&lt;b&gt;LEGEND&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontSize=10;fontStyle=1;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="2120" y="870" width="230" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="9001" value="AWS Service"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="2130" y="900" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="9002" value="Azure Service"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="2240" y="900" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="9003" value="Security Control"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="2130" y="940" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="9004" value="GCP Service"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="2240" y="940" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="9005" value="Observability"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="2130" y="980" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="9006" value="Optional (toggle)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCCCFF;strokeColor=#6666CC;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="2240" y="980" width="100" height="28" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

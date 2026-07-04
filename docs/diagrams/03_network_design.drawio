@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-14" version="21.0.0">
+  <diagram name="03 - Network Design" id="network-design-v1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="9" value="&lt;b&gt;Aura Promptly — Network Design (v1.1)&lt;/b&gt;&lt;br&gt;Hub VPC Topology · VPC Endpoints · Spoke Connectivity"
+          style="text;html=1;fontSize=15;fontStyle=1;align=center;fillColor=#24292E;fontColor=#FFFFFF;strokeColor=none;rounded=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1820" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- INTERNET CLOUD (top)                                -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="10" value="&lt;b&gt;Internet&lt;/b&gt;&lt;br&gt;(Public internet — HTTPS/443 only)"
+          style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;strokeWidth=2;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="320" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- External services reachable from hub (via NAT) -->
+        <mxCell id="11" value="&lt;b&gt;OpenAI API&lt;/b&gt;&lt;br&gt;api.openai.com"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00A67E;strokeColor=#007A5E;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="220" y="80" width="150" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="12" value="&lt;b&gt;Vertex AI&lt;/b&gt;&lt;br&gt;aiplatform.googleapis.com"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1350" y="80" width="170" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="13" value="&lt;b&gt;Grafana Cloud&lt;/b&gt;&lt;br&gt;(optional · OTel export)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0820F;strokeColor=#B85A00;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1560" y="80" width="170" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="14" value="&lt;b&gt;AWS STS&lt;/b&gt;&lt;br&gt;sts.amazonaws.com&lt;br&gt;(GCP spoke OIDC exchange)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="165" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- HUB VPC                                             -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="100" value="&lt;b&gt;Hub VPC  10.0.0.0/16  (us-east-1)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8F0;strokeColor=#FF9900;strokeWidth=3;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="200" y="200" width="1400" height="720" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- PUBLIC SUBNETS (2 AZs)                             -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="110" value="&lt;b&gt;Public Subnets&lt;/b&gt;  ·  10.0.1.0/24 (AZ-a)  ·  10.0.2.0/24 (AZ-b)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="225" y="250" width="1350" height="195" as="geometry"/>
+        </mxCell>
+
+        <!-- Internet Gateway -->
+        <mxCell id="111" value="&lt;b&gt;Internet Gateway&lt;/b&gt;&lt;br&gt;Attached to VPC&lt;br&gt;Enables public subnet internet routing"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="245" y="293" width="195" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- NAT Gateway -->
+        <mxCell id="112" value="&lt;b&gt;NAT Gateway&lt;/b&gt;&lt;br&gt;In public subnet&lt;br&gt;EIP attached&lt;br&gt;Private subnets route&lt;br&gt;0.0.0.0/0 here&lt;br&gt;~$32/mo + data charges"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="470" y="285" width="180" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- ALB -->
+        <mxCell id="113" value="&lt;b&gt;Application Load Balancer&lt;/b&gt;&lt;br&gt;Internal (not internet-facing)&lt;br&gt;Spans both AZs&lt;br&gt;Port 80 → LiteLLM:4000&lt;br&gt;Port 4001 → Admin UI&lt;br&gt;Target: ECS Fargate tasks"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="685" y="285" width="270" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- API Gateway note -->
+        <mxCell id="114" value="&lt;b&gt;API Gateway&lt;/b&gt;&lt;br&gt;Regional endpoint&lt;br&gt;Outside VPC (managed)&lt;br&gt;Routes to internal ALB&lt;br&gt;via VPC Link"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="990" y="290" width="190" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- WAF note -->
+        <mxCell id="115" value="&lt;b&gt;WAF WebACL&lt;/b&gt;&lt;br&gt;Attached to API GW&lt;br&gt;OWASP + rate-limit"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1210" y="300" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- PRIVATE SUBNETS                                     -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="120" value="&lt;b&gt;Private Subnets&lt;/b&gt;  ·  10.0.10.0/24 (AZ-a)  ·  10.0.11.0/24 (AZ-b)&lt;br&gt;Route table: 0.0.0.0/0 → NAT Gateway  ·  AWS services → VPC Endpoints"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="225" y="463" width="1350" height="435" as="geometry"/>
+        </mxCell>
+
+        <!-- ECS Fargate -->
+        <mxCell id="121" value="&lt;b&gt;ECS Fargate Tasks&lt;/b&gt;&lt;br&gt;LiteLLM Proxy&lt;br&gt;0.25 vCPU · 512 MB&lt;br&gt;OTel Collector (sidecar)&lt;br&gt;SG: allow 4000 from ALB"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="245" y="510" width="235" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Aurora Serverless -->
+        <mxCell id="122" value="&lt;b&gt;Aurora Serverless v2&lt;/b&gt;&lt;br&gt;(PostgreSQL + pgvector)&lt;br&gt;Multi-AZ cluster&lt;br&gt;Schema: litellm + bedrock_kb&lt;br&gt;SG: allow 5432 from ECS SG&lt;br&gt;Auto-pause: 5 min inactivity"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="510" y="510" width="270" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- ElastiCache Redis -->
+        <mxCell id="123" value="&lt;b&gt;ElastiCache Redis&lt;/b&gt;&lt;br&gt;cache.t4g.micro&lt;br&gt;Single AZ (PoC)&lt;br&gt;SG: allow 6379 from ECS SG"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="815" y="510" width="220" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- VPC ENDPOINTS BOX                                   -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="130" value="&lt;b&gt;VPC Endpoints  (Interface unless noted)&lt;/b&gt;&lt;br&gt;Private connectivity — avoids NAT Gateway charges for AWS services"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="245" y="655" width="1310" height="225" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="131" value="&lt;b&gt;bedrock-runtime&lt;/b&gt;&lt;br&gt;com.amazonaws.us-east-1&lt;br&gt;.bedrock-runtime&lt;br&gt;Interface · PrivateDNS: on&lt;br&gt;SG: allow 443 from ECS SG&lt;br&gt;Saves NAT cost for all Bedrock calls"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="260" y="700" width="195" height="155" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="132" value="&lt;b&gt;secretsmanager&lt;/b&gt;&lt;br&gt;com.amazonaws.us-east-1&lt;br&gt;.secretsmanager&lt;br&gt;Interface · PrivateDNS: on&lt;br&gt;All secrets reads stay private"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="472" y="700" width="195" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="133" value="&lt;b&gt;s3  (Gateway)&lt;/b&gt;&lt;br&gt;com.amazonaws.us-east-1.s3&lt;br&gt;Gateway endpoint · FREE&lt;br&gt;Route table entry only&lt;br&gt;Config YAML · KB docs · TF state"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="680" y="700" width="195" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="134" value="&lt;b&gt;ecr.api + ecr.dkr&lt;/b&gt;&lt;br&gt;com.amazonaws.us-east-1&lt;br&gt;.ecr.api / .ecr.dkr&lt;br&gt;Interface · PrivateDNS: on&lt;br&gt;ECS pulls LiteLLM image"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="890" y="700" width="195" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="135" value="&lt;b&gt;logs&lt;/b&gt;&lt;br&gt;com.amazonaws.us-east-1.logs&lt;br&gt;Interface · PrivateDNS: on&lt;br&gt;ECS task → CloudWatch&lt;br&gt;No internet route needed"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="1100" y="700" width="180" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="136" value="&lt;b&gt;bedrock-agent-runtime&lt;/b&gt;&lt;br&gt;com.amazonaws.us-east-1&lt;br&gt;.bedrock-agent-runtime&lt;br&gt;Interface · PrivateDNS: on&lt;br&gt;For Bedrock Agent calls"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="1295" y="700" width="195" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SPOKE CONNECTIONS                                   -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- Azure Spoke -->
+        <mxCell id="200" value="&lt;b&gt;AZURE SPOKE&lt;/b&gt;&lt;br&gt;Azure Container Apps&lt;br&gt;No VNet required&lt;br&gt;Outbound internet only"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E5F0FF;strokeColor=#0078D4;strokeWidth=2;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="990" width="210" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="201" value="&lt;b&gt;AWS SPOKE&lt;/b&gt;&lt;br&gt;ECS Fargate (spoke VPC)&lt;br&gt;Outbound via NAT or Lambda&lt;br&gt;Cross-account IAM role"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#FF9900;strokeWidth=2;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="700" y="990" width="210" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="202" value="&lt;b&gt;GCP SPOKE&lt;/b&gt;&lt;br&gt;Cloud Run (serverless)&lt;br&gt;No VPC required&lt;br&gt;Workload Identity → STS"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#4285F4;strokeWidth=2;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1570" y="990" width="210" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Connection from Azure → API GW (passes through Internet and WAF) -->
+        <mxCell id="e200" value="HTTPS + API Key"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0078D4;fontColor=#0078D4;fontSize=9;fontStyle=1;dashed=1;"
+          edge="1" source="200" target="114" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="145" y="960"/>
+              <mxPoint x="1085" y="960"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e201" value="HTTPS + IAM Sig V4"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#CC7A00;fontColor=#CC7A00;fontSize=9;fontStyle=1;dashed=1;"
+          edge="1" source="201" target="114" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e202" value="HTTPS + OIDC→STS→IAM Sig V4"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#4285F4;fontColor=#4285F4;fontSize=9;fontStyle=1;dashed=1;"
+          edge="1" source="202" target="114" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1675" y="960"/>
+              <mxPoint x="1085" y="960"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Internal: API GW → ALB → ECS -->
+        <mxCell id="e300" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="114" target="113" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e301" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="113" target="121" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e302" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="121" target="122" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e303" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" source="121" target="123" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- ECS → VPC endpoints -->
+        <mxCell id="e304" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;dashed=1;" edge="1" source="121" target="131" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e305" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;dashed=1;" edge="1" source="121" target="132" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- NAT → Internet -->
+        <mxCell id="e306" value="Outbound internet (OpenAI, Vertex, Grafana)" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#666666;fontStyle=1;fontSize=8;" edge="1" source="112" target="10" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e307" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;" edge="1" source="121" target="112" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- Internet → External services -->
+        <mxCell id="e308" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;" edge="1" source="10" target="11" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e309" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;" edge="1" source="10" target="12" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e310" value="" style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;strokeWidth=1;dashed=1;" edge="1" source="10" target="13" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SECURITY GROUPS LEGEND                              -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="900" value="&lt;b&gt;Security Groups Summary&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;sg-alb (ALB):&lt;/b&gt;&lt;br&gt;  IN: 443 from 0.0.0.0/0 (API GW managed SG)&lt;br&gt;&lt;br&gt;&lt;b&gt;sg-ecs (ECS tasks):&lt;/b&gt;&lt;br&gt;  IN: 4000 from sg-alb&lt;br&gt;  OUT: 443 to VPC endpoints (Bedrock, Secrets, ECR, logs)&lt;br&gt;  OUT: 443 to NAT GW (OpenAI, Vertex, Grafana)&lt;br&gt;  OUT: 5432 to sg-aurora&lt;br&gt;  OUT: 6379 to sg-redis&lt;br&gt;&lt;br&gt;&lt;b&gt;sg-aurora:&lt;/b&gt;&lt;br&gt;  IN: 5432 from sg-ecs&lt;br&gt;&lt;br&gt;&lt;b&gt;sg-redis:&lt;/b&gt;&lt;br&gt;  IN: 6379 from sg-ecs&lt;br&gt;&lt;br&gt;&lt;b&gt;sg-vpc-endpoints:&lt;/b&gt;&lt;br&gt;  IN: 443 from sg-ecs"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=8;align=left;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="1640" y="430" width="260" height="420" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

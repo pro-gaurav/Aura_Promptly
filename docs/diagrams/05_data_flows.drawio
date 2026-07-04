@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-14" version="21.0.0">
+  <diagram name="05 - Data Flows" id="data-flows-v1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="9" value="&lt;b&gt;Aura Promptly — Data Flows (v1.1)&lt;/b&gt;&lt;br&gt;Three use-case request/response flows: RAG Chatbot · Research Assistant · Summarisation"
+          style="text;html=1;fontSize=15;fontStyle=1;align=center;fillColor=#24292E;fontColor=#FFFFFF;strokeColor=none;rounded=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1820" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- FLOW 1: RAG CHATBOT (Azure Spoke)                  -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="100" value="&lt;b&gt;Flow 1: RAG Chatbot — Azure Spoke → Bedrock Knowledge Base&lt;/b&gt;&lt;br&gt;Use Case: Financial Services FAQ  ·  Auth: API Key"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E5F0FF;strokeColor=#0078D4;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="1820" height="390" as="geometry"/>
+        </mxCell>
+
+        <!-- Component boxes for Flow 1 -->
+        <mxCell id="101" value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;Browser"
+          style="ellipse;whiteSpace=wrap;html=1;fillColor=#E5F0FF;strokeColor=#0078D4;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="90" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="102" value="&lt;b&gt;Azure Container Apps&lt;/b&gt;&lt;br&gt;FastAPI + Streamlit&lt;br&gt;RAG chat UI"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="185" y="110" width="150" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="103" value="&lt;b&gt;AWS WAF +&lt;br&gt;API Gateway&lt;/b&gt;&lt;br&gt;x-api-key auth&lt;br&gt;rate limit"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="375" y="110" width="140" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="104" value="&lt;b&gt;LiteLLM Proxy&lt;/b&gt;&lt;br&gt;Route: bedrock-kb&lt;br&gt;Budget check&lt;br&gt;Content filter"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="555" y="110" width="150" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="105" value="&lt;b&gt;Bedrock KB&lt;/b&gt;&lt;br&gt;Retrieve API&lt;br&gt;Query → vector search&lt;br&gt;Top-5 chunks returned"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="750" y="110" width="160" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="106" value="&lt;b&gt;Aurora pgvector&lt;/b&gt;&lt;br&gt;HNSW index&lt;br&gt;Semantic search&lt;br&gt;bedrock_kb schema"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="960" y="110" width="160" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="107" value="&lt;b&gt;Titan Embeddings v2&lt;/b&gt;&lt;br&gt;Embed query text&lt;br&gt;1024-dim vector&lt;br&gt;Used for retrieval"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="960" y="215" width="160" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="108" value="&lt;b&gt;Claude Haiku 3&lt;/b&gt;&lt;br&gt;Generate answer&lt;br&gt;Context = top-5 chunks&lt;br&gt;+ user question"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1170" y="110" width="160" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="109" value="&lt;b&gt;Bedrock Guardrails&lt;/b&gt;&lt;br&gt;Applied at invocation&lt;br&gt;Checks output before&lt;br&gt;returning to LiteLLM"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1370" y="110" width="160" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- Flow 1 arrows -->
+        <mxCell id="e101" value="1. chat question" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#0078D4;fontSize=8;fontStyle=1;" edge="1" source="101" target="102" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e102" value="2. POST /v1/chat&lt;br&gt;+ x-api-key" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#0078D4;fontSize=8;" edge="1" source="102" target="103" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e103" value="3. validated" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="103" target="104" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e104" value="4. retrieve+generate" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="104" target="105" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e105" value="5. embed query" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="105" target="107" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e106" value="6. vector search (HNSW)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="105" target="106" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e107" value="7. invoke + context" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="105" target="108" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e108" value="8. content check" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#B85450;fontSize=8;" edge="1" source="108" target="109" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e109" value="9. answer (streaming)" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" source="109" target="101" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1450" y="215"/>
+              <mxPoint x="105" y="215"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Flow 1 KB Sync sub-flow -->
+        <mxCell id="110" value="&lt;b&gt;KB Document Sync (offline / periodic)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=10;fontStyle=1;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="300" width="1780" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="111" value="&lt;b&gt;S3 Bucket&lt;/b&gt;&lt;br&gt;KB source docs&lt;br&gt;HTML · PDF · TXT"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="90" y="345" width="150" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="112" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;workflow_dispatch&lt;br&gt;or scheduled trigger"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#24292E;strokeColor=#586069;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="280" y="345" width="150" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="113" value="&lt;b&gt;Bedrock KB Sync&lt;/b&gt;&lt;br&gt;StartIngestionJob API&lt;br&gt;Poll until COMPLETE&lt;br&gt;(poll-and-wait pattern)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="470" y="345" width="175" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="114" value="&lt;b&gt;Titan Embeddings v2&lt;/b&gt;&lt;br&gt;Embed each chunk&lt;br&gt;Batch processing"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="685" y="345" width="155" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="115" value="&lt;b&gt;Aurora pgvector&lt;/b&gt;&lt;br&gt;Store vectors&lt;br&gt;HNSW index rebuild&lt;br&gt;bedrock_kb schema"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="880" y="345" width="155" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e111" value="upload docs" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="112" target="111" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e112" value="trigger sync" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="112" target="113" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e113" value="read + chunk" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="113" target="111" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e114" value="embed" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="113" target="114" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e115" value="store vectors" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="114" target="115" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- FLOW 2: RESEARCH ASSISTANT (AWS Spoke / Bedrock Agent) -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="200" value="&lt;b&gt;Flow 2: Research Assistant — AWS Spoke → Bedrock Agent → Knowledge Base&lt;/b&gt;&lt;br&gt;Use Case: Governance board summary  ·  Auth: IAM Sig V4"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#FF9900;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="1820" height="310" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="201" value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;Browser"
+          style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#FF9900;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="530" width="90" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="202" value="&lt;b&gt;ECS Fargate&lt;/b&gt;&lt;br&gt;FastAPI + Streamlit&lt;br&gt;Research UI"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="185" y="520" width="150" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="203" value="&lt;b&gt;API GW (IAM auth)&lt;/b&gt;&lt;br&gt;Sig V4 validated&lt;br&gt;Cross-account role"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="375" y="520" width="150" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="204" value="&lt;b&gt;LiteLLM Proxy&lt;/b&gt;&lt;br&gt;Route: bedrock-agent&lt;br&gt;Session tracking&lt;br&gt;Spend logging"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="565" y="520" width="150" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="205" value="&lt;b&gt;Bedrock Agent&lt;/b&gt;&lt;br&gt;Model: Claude Haiku 3&lt;br&gt;Orchestrates multi-step&lt;br&gt;Plan → Act → Observe"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="520" width="165" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="206" value="&lt;b&gt;Lambda Action Group&lt;/b&gt;&lt;br&gt;search_knowledge_base()&lt;br&gt;Calls Bedrock KB Retrieve&lt;br&gt;Returns top-5 chunks"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="975" y="520" width="175" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="207" value="&lt;b&gt;Bedrock KB&lt;/b&gt;&lt;br&gt;Retrieve API&lt;br&gt;Aurora pgvector&lt;br&gt;HNSW search"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1200" y="520" width="155" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="208" value="&lt;b&gt;Claude Haiku 3&lt;/b&gt;&lt;br&gt;Final synthesis&lt;br&gt;Structured board-ready&lt;br&gt;summary output"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1405" y="520" width="155" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="209" value="&lt;b&gt;Bedrock Guardrails&lt;/b&gt;&lt;br&gt;Final output check&lt;br&gt;Before response"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1600" y="520" width="145" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e201" value="1. research query" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontSize=8;fontStyle=1;" edge="1" source="201" target="202" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e202" value="2. POST + Sig V4" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontSize=8;" edge="1" source="202" target="203" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e203" value="3. forward" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="203" target="204" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e204" value="4. InvokeAgent" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="204" target="205" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e205" value="5. invoke action" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="205" target="206" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e206" value="6. KB retrieve" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="206" target="207" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e207" value="7. synthesise" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="205" target="208" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e208" value="8. guard check" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#B85450;fontSize=8;" edge="1" source="208" target="209" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e209" value="9. structured summary" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" source="209" target="201" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1672" y="630"/>
+              <mxPoint x="105" y="630"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Agent multi-step note -->
+        <mxCell id="210" value="&lt;b&gt;Agent multi-step loop (may repeat steps 5–7 multiple times):&lt;/b&gt;&lt;br&gt;Agent plans → invokes action (Lambda) → observes results → re-plans if needed → final answer when confident.  Session ID maintained for 30 min."
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="610" width="810" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- FLOW 3: SUMMARISATION (GCP Spoke)                  -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="300" value="&lt;b&gt;Flow 3: Summarisation — GCP Spoke → LiteLLM → Model Selection&lt;/b&gt;&lt;br&gt;Use Case: Compliance report summarisation  ·  Auth: GCP OIDC → AWS STS → IAM Sig V4"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#4285F4;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="815" width="1820" height="340" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="301" value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;Browser"
+          style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#4285F4;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="870" width="90" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="302" value="&lt;b&gt;Cloud Run&lt;/b&gt;&lt;br&gt;FastAPI + Streamlit&lt;br&gt;Doc summary UI&lt;br&gt;PDF/text input"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="185" y="860" width="155" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="303" value="&lt;b&gt;GCP Metadata Server&lt;/b&gt;&lt;br&gt;OIDC token (15-min)&lt;br&gt;→ STS exchange&lt;br&gt;Temp AWS creds"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="380" y="860" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="304" value="&lt;b&gt;API GW (IAM auth)&lt;/b&gt;&lt;br&gt;Sig V4 validated&lt;br&gt;Same auth as AWS spoke"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="585" y="860" width="150" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="305" value="&lt;b&gt;LiteLLM Proxy&lt;/b&gt;&lt;br&gt;Route decision&lt;br&gt;bedrock-haiku (default)&lt;br&gt;vertex-flash (GCP demo)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F0FF;strokeColor=#0050C8;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="785" y="860" width="165" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Route fork -->
+        <mxCell id="306" value="&lt;b&gt;Route A: Claude Haiku 3&lt;/b&gt;&lt;br&gt;Bedrock (VPC endpoint)&lt;br&gt;Default low-cost path&lt;br&gt;Guardrails applied"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1010" y="830" width="180" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="307" value="&lt;b&gt;Route B: Gemini 1.5 Flash&lt;/b&gt;&lt;br&gt;Vertex AI (internet)&lt;br&gt;General route (vertex-flash alias)&lt;br&gt;Available to all spokes — shown here&lt;br&gt;in GCP demo context"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1010" y="945" width="180" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="308" value="&lt;b&gt;Bedrock Guardrails&lt;/b&gt;&lt;br&gt;Output content check&lt;br&gt;Applied on Route A"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1245" y="830" width="155" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- LiteLLM fallback box -->
+        <mxCell id="309" value="&lt;b&gt;Fallback Chain (LiteLLM config)&lt;/b&gt;&lt;br&gt;Primary: bedrock-haiku&lt;br&gt;Fallback 1: openai-mini (if Bedrock throttled)&lt;br&gt;Fallback 2: vertex-flash (if OpenAI down)&lt;br&gt;Automatic retry with exponential backoff"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1450" y="860" width="380" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- Response paths -->
+        <mxCell id="310" value="Summary response (structured text, bullet points)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="785" y="980" width="300" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e301" value="1. submit doc" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#4285F4;fontSize=8;fontStyle=1;" edge="1" source="301" target="302" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e302" value="2. get OIDC token → STS creds" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#4285F4;fontSize=8;" edge="1" source="302" target="303" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e303" value="3. POST + Sig V4" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="303" target="304" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e304" value="4. forward" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" source="304" target="305" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e305" value="Route A (default)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontSize=8;" edge="1" source="305" target="306" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e306" value="Route B (GCP demo)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#4285F4;fontSize=8;dashed=1;" edge="1" source="305" target="307" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e307" value="" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#B85450;" edge="1" source="306" target="308" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e308" value="5. structured summary" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" source="308" target="310" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e309" value="" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;" edge="1" source="307" target="310" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e310" value="6. display to user" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" source="310" target="301" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="935" y="1010"/>
+              <mxPoint x="105" y="1010"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- GUARDRAILS FLOW (cross-cutting concern)            -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="400" value="&lt;b&gt;Guardrails Architecture — Request Filter Chain (applies to all 3 flows)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="1185" width="1820" height="215" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="401" value="&lt;b&gt;App&lt;/b&gt;&lt;br&gt;Spoke"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="1240" width="90" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="402" value="&lt;b&gt;API Gateway&lt;/b&gt;&lt;br&gt;Check 1: Auth&lt;br&gt;Check 2: Rate limit"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="190" y="1230" width="150" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="403" value="&lt;b&gt;LiteLLM Content Filter&lt;/b&gt;&lt;br&gt;Pre-call callback&lt;br&gt;Keyword deny list&lt;br&gt;Prompt injection detect&lt;br&gt;→ HTTP 400 if blocked&lt;br&gt;source: litellm"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="385" y="1225" width="195" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="404" value="&lt;b&gt;Bedrock Guardrails&lt;/b&gt;&lt;br&gt;Applied at model invocation&lt;br&gt;Hate / Violence / Sexual&lt;br&gt;PII / Denied topics&lt;br&gt;→ HTTP 400 if blocked&lt;br&gt;source: bedrock_guardrail"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="630" y="1225" width="195" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="405" value="&lt;b&gt;Bedrock Model&lt;/b&gt;&lt;br&gt;Claude Haiku 3&lt;br&gt;Normal response"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="875" y="1235" width="155" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="406" value="&lt;b&gt;Block Response Examples:&lt;/b&gt;&lt;br&gt;&lt;br&gt;Blocked by LiteLLM:&lt;br&gt;HTTP 400 {&quot;error&quot;: &quot;content_policy_violation&quot;, &quot;source&quot;: &quot;litellm&quot;}&lt;br&gt;&lt;br&gt;Blocked by Bedrock Guardrail:&lt;br&gt;HTTP 400 {&quot;error&quot;: &quot;content_policy_violation&quot;, &quot;source&quot;: &quot;bedrock_guardrail&quot;}&lt;br&gt;&lt;br&gt;All block events logged to CloudWatch + Grafana Dashboard ④"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1090" y="1225" width="500" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e401" value="request" style="endArrow=block;endFill=1;strokeWidth=1;" edge="1" source="401" target="402" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e402" value="auth ok" style="endArrow=block;endFill=1;strokeWidth=1;" edge="1" source="402" target="403" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e403" value="content ok" style="endArrow=block;endFill=1;strokeWidth=1;" edge="1" source="403" target="404" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e404" value="allowed" style="endArrow=block;endFill=1;strokeWidth=1;" edge="1" source="404" target="405" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-14" version="21.0.0">
+  <diagram name="04 - Authentication Flows" id="auth-flows-v1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="9" value="&lt;b&gt;Aura Promptly — Authentication &amp; Authorisation Flows (v1.1)&lt;/b&gt;&lt;br&gt;Three spoke authentication patterns: API Key (Azure) · IAM Sig V4 (AWS) · GCP OIDC→STS (GCP)"
+          style="text;html=1;fontSize=15;fontStyle=1;align=center;fillColor=#24292E;fontColor=#FFFFFF;strokeColor=none;rounded=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1820" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- FLOW 1: AZURE — API KEY AUTH                       -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="100" value="&lt;b&gt;Flow 1: Azure Spoke — API Key Authentication&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E5F0FF;strokeColor=#0078D4;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="560" height="590" as="geometry"/>
+        </mxCell>
+
+        <!-- Step headers -->
+        <mxCell id="101" value="&lt;b&gt;① SETUP (one-time, by platform engineer)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="108" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="102" value="Platform engineer creates team in LiteLLM Admin UI (or Terraform)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="148" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="103" value="LiteLLM generates virtual API key → stores SHA256 hash in Aurora DB (litellm schema)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="188" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="104" value="API Gateway usage plan linked to key (rate limit enforced at gateway edge)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="228" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="105" value="Team stores plaintext key in Azure Key Vault  —  NEVER in code or env vars"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="268" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="106" value="&lt;b&gt;② RUNTIME (every request)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="312" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="107" value="Azure Container App reads API key from Azure Key Vault (MSI auth — no secrets in env)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="352" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="108" value="App sends POST /v1/chat/completions  with header:  x-api-key: &lt;key&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="392" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="109" value="WAF inspects request (OWASP rules · rate limit check per IP)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="432" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="110" value="API Gateway validates x-api-key against Usage Plan  →  rejects if unknown or over quota"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="472" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="111" value="LiteLLM validates key hash against Aurora DB  →  checks team budget"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="522" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="112" value="Request routed to model  →  response returned via API Gateway  →  Azure App"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;align=left;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="562" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="113" value="&lt;b&gt;Key rotation:&lt;/b&gt; New key issued in LiteLLM UI → old key revoked → new key updated in Azure Key Vault.  No downtime required (both keys valid during rotation window)."
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="605" width="500" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- FLOW 2: AWS SPOKE — IAM SIG V4                     -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="200" value="&lt;b&gt;Flow 2: AWS Spoke — IAM Signature V4 (Cross-Account)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#FF9900;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="640" y="70" width="560" height="590" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="201" value="&lt;b&gt;① SETUP (Terraform, one-time)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="108" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="202" value="Hub Terraform creates IAM role in hub account:  aura-promptly-hub-invoke-role"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="148" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="203" value="Trust policy: allows spoke account root to AssumeRole  →  conditional on spoke role ARN"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="188" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="204" value="Permissions policy: execute-api:Invoke on hub API Gateway ARN  (least privilege)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="228" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="205" value="API Gateway IAM authoriser configured to validate Sig V4 on /v1/* routes"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="268" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="206" value="&lt;b&gt;② RUNTIME (per request, automatic STS refresh)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="312" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="207" value="ECS task role in spoke account calls STS:AssumeRole  →  hub role ARN"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="352" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="208" value="STS returns temporary credentials: AccessKeyId · SecretAccessKey · SessionToken (1-hr TTL)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="392" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="209" value="App signs HTTP request using AWS Sig V4:  Authorization header + x-amz-date + x-amz-security-token"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="432" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="210" value="API Gateway IAM authoriser validates signature  →  verifies role ARN in principal matches trust policy"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="472" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="211" value="LiteLLM receives request (API key not required — IAM auth at gateway layer)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="522" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="212" value="Request routed to model  →  response returned  (no long-lived credentials used)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;align=left;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="562" width="500" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="213" value="&lt;b&gt;Security note:&lt;/b&gt; No static credentials stored anywhere in the spoke. ECS task role automatically vends STS tokens. Spoke IAM role is separate from hub account and follows least-privilege."
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="605" width="500" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- FLOW 3: GCP SPOKE — OIDC → STS                    -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="300" value="&lt;b&gt;Flow 3: GCP Spoke — Workload Identity OIDC → AWS STS → IAM Sig V4&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#4285F4;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=5;"
+          vertex="1" parent="1">
+          <mxGeometry x="1240" y="70" width="620" height="590" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="301" value="&lt;b&gt;① SETUP (Terraform, one-time)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="108" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="302" value="Hub Terraform creates IAM role:  aura-promptly-gcp-spoke-role"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="148" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="303" value="Trust policy: Principal Federated = accounts.google.com  +  Condition: sub = &lt;GCP_SA_UNIQUE_ID&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="188" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="304" value="Action: sts:AssumeRoleWithWebIdentity  ·  Permissions: execute-api:Invoke on API GW ARN"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="228" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="305" value="No Cognito dependency  ·  No extra token exchange step  ·  AWS-documented pattern (Dec 2023)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="268" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="306" value="&lt;b&gt;② RUNTIME — Token Exchange (every 15 minutes, automatic)&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=10;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="312" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="307" value="Cloud Run service account calls GCP metadata server:  GET /computeMetadata/v1/instance/service-accounts/default/identity?audience=&lt;hub_arn&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="352" width="580" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="308" value="Metadata server returns signed OIDC JWT token  (iss: accounts.google.com · sub: SA unique ID)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="402" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="309" value="App calls STS:AssumeRoleWithWebIdentity with OIDC token  →  hub role ARN  →  external ID"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="442" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="310" value="STS validates OIDC token signature against accounts.google.com JWKS  ·  checks sub condition  →  returns temporary creds (15-min TTL)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="482" width="580" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="311" value="App signs request using AWS Sig V4  →  POST /v1/chat/completions to Hub API Gateway"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4285F4;fontSize=9;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="532" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="312" value="API Gateway IAM authoriser validates Sig V4  →  verifies assumed role ARN  →  forwards to LiteLLM"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=9;align=left;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="572" width="580" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="313" value="&lt;b&gt;Benefits vs Cognito (v1.0):&lt;/b&gt; Removes one token exchange step (~50ms saved) · Single IAM authoriser handles both AWS &amp; GCP spokes · No Cognito cost · AWS-documented pattern · Credentials auto-refresh before 15-min expiry."
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=8;align=left;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="615" width="580" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SEQUENCE FLOW DIAGRAMS (visual arrows)             -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="400" value="&lt;b&gt;Auth Decision Matrix&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Spoke&lt;/b&gt;    &lt;b&gt;Auth Method&lt;/b&gt;    &lt;b&gt;Why chosen&lt;/b&gt;&lt;br&gt;&lt;br&gt;Azure  ·  API Key (x-api-key)  ·  Simplest; no AWS footprint in Azure; key in Key Vault&lt;br&gt;&lt;br&gt;AWS  ·  IAM Sig V4 (cross-account STS)  ·  Native AWS; no long-lived creds; IAM auditable&lt;br&gt;&lt;br&gt;GCP  ·  GCP OIDC → AWS STS → IAM Sig V4  ·  Direct federation; no Cognito; AWS-documented; fastest&lt;br&gt;&lt;br&gt;&lt;b&gt;Common:&lt;/b&gt; All spokes connect over public HTTPS to API Gateway. WAF inspects all requests. TLS 1.2+ enforced. No VPN or private peering."
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontSize=9;align=left;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="690" width="1820" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SEQUENCE DIAGRAMS — VISUAL                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+
+        <!-- Flow 1 Visual Sequence -->
+        <mxCell id="500" value="&lt;b&gt;Azure API Key — Sequence&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E5F0FF;strokeColor=#0078D4;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="850" width="560" height="530" as="geometry"/>
+        </mxCell>
+
+        <!-- Actors -->
+        <mxCell id="501" value="&lt;b&gt;Azure App&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="900" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="502" value="&lt;b&gt;Azure Key Vault&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#50E6FF;strokeColor=#0078D4;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="200" y="900" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="503" value="&lt;b&gt;AWS WAF&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="360" y="900" width="90" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="504" value="&lt;b&gt;API Gateway&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="480" y="900" width="100" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Lifelines -->
+        <mxCell id="511" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="110" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="110" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="512" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="260" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="260" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="513" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="405" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="405" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="514" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="530" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="530" y="1340"/></Array></mxGeometry>
+        </mxCell>
+
+        <!-- Messages -->
+        <mxCell id="521" value="1. get secret (MSI)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#0078D4;fontColor=#0078D4;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="110" y="970" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="260" y="970"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="522" value="2. return API key" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#0078D4;fontColor=#0078D4;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="260" y="1000" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="110" y="1000"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="523" value="3. POST /v1/chat/completions + x-api-key" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="110" y="1040" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="405" y="1040"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="524" value="4. OWASP + rate check (PASS)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#B85450;fontColor=#B85450;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="405" y="1075" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="530" y="1075"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="525" value="5. validate x-api-key vs usage plan" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="530" y="1110" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="530" y="1110"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="526" value="6. forward to LiteLLM" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="530" y="1145" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="590" y="1145"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="527" value="7. validate key hash + budget (Aurora DB)" style="text;html=1;fontSize=8;align=left;" vertex="1" parent="1">
+          <mxGeometry x="465" y="1165" width="120" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="528" value="8. model response" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="530" y="1220" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="110" y="1220"/></Array></mxGeometry>
+        </mxCell>
+
+        <!-- Flow 2 Visual Sequence -->
+        <mxCell id="600" value="&lt;b&gt;AWS IAM Sig V4 — Sequence&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2E8;strokeColor=#FF9900;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="640" y="850" width="560" height="530" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="601" value="&lt;b&gt;AWS Spoke App&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="660" y="900" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="602" value="&lt;b&gt;AWS STS&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="810" y="900" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="603" value="&lt;b&gt;API Gateway + IAM Auth&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1000" y="900" width="150" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="611" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="715" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="715" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="612" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="860" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="860" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="613" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="1075" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1075" y="1340"/></Array></mxGeometry>
+        </mxCell>
+
+        <mxCell id="621" value="1. AssumeRole (hub role ARN)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="715" y="975" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="860" y="975"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="622" value="2. return temp creds (1-hr TTL)" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="860" y="1010" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="715" y="1010"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="623" value="3. sign request with Sig V4 (AccessKeyId+SecretKey+SessionToken)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="715" y="1055" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1075" y="1055"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="624" value="4. validate Sig V4 signature" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1075" y="1090" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1075" y="1090"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="625" value="5. verify role ARN = allowed principal" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1075" y="1125" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1075" y="1125"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="626" value="6. forward to LiteLLM (no key required)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1075" y="1160" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1160" y="1160"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="627" value="7. model response" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1075" y="1210" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="715" y="1210"/></Array></mxGeometry>
+        </mxCell>
+
+        <!-- Flow 3 Visual Sequence -->
+        <mxCell id="700" value="&lt;b&gt;GCP OIDC → STS — Sequence&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0FE;strokeColor=#4285F4;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;"
+          vertex="1" parent="1">
+          <mxGeometry x="1240" y="850" width="620" height="530" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="701" value="&lt;b&gt;GCP Cloud Run&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1260" y="900" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="702" value="&lt;b&gt;GCP Metadata&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;strokeColor=#2956A3;fontColor=#FFFFFF;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1400" y="900" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="703" value="&lt;b&gt;AWS STS&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1540" y="900" width="90" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="704" value="&lt;b&gt;API GW + IAM&lt;/b&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#CC7A00;fontColor=#000000;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="1670" y="900" width="110" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="711" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="1315" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1315" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="712" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="1455" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1455" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="713" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="1585" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1585" y="1340"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="714" value="" style="endArrow=none;dashed=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry x="1725" y="940" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1725" y="1340"/></Array></mxGeometry>
+        </mxCell>
+
+        <mxCell id="721" value="1. GET /identity?audience=hub_arn" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#4285F4;fontColor=#4285F4;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1315" y="975" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1455" y="975"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="722" value="2. return signed OIDC JWT (iss:accounts.google.com)" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#4285F4;fontColor=#4285F4;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1455" y="1010" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1315" y="1010"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="723" value="3. AssumeRoleWithWebIdentity (OIDC token + role ARN)" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1315" y="1055" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1585" y="1055"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="724" value="4. validate OIDC JWT via Google JWKS + check sub condition" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1585" y="1090" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1585" y="1090"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="725" value="5. return temp creds (15-min TTL)" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1585" y="1130" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1315" y="1130"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="726" value="6. POST /v1/chat/completions + Sig V4" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#666666;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1315" y="1170" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1725" y="1170"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="727" value="7. validate Sig V4 + role ARN" style="endArrow=block;endFill=1;strokeWidth=1;strokeColor=#FF9900;fontColor=#CC7A00;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1725" y="1205" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1725" y="1205"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="728" value="8. model response" style="endArrow=block;endFill=1;strokeWidth=1;dashed=1;strokeColor=#006600;fontColor=#006600;fontSize=8;" edge="1" parent="1">
+          <mxGeometry x="1725" y="1250" width="1" height="1" as="geometry"><Array as="points"><mxPoint x="1315" y="1250"/></Array></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
